@@ -28,24 +28,49 @@ const client = new Client(dbConfig);
 client.connect();
 
 app.get("/", async (req, res) => {
-  const dbres = await client.query("select breed, votes from dog_breeds");
-  res.json(dbres.rows);
+  try {
+    const dbres = await client.query("select breed, votes from dog_breeds");
+    res.status(200).json({ status: "success", data: dbres.rows });
+  } catch (err) {
+    res.status(404).json({ status: "failed", error: err });
+  }
 });
 
 app.get("/leaderboard", async (req, res) => {
-  const dbres = await client.query(
-    "select breed, votes from dog_breeds order by votes desc limit 10"
-  );
-  res.json(dbres.rows);
+  try {
+    const dbres = await client.query(
+      "select breed, votes from dog_breeds order by votes desc limit 10"
+    );
+    res.status(200).json({ status: "success", data: dbres.rows });
+  } catch (err) {
+    res.status(404).json({ status: "failed", error: err });
+  }
 });
 
-app.put("/votes/:breed", async (req, res) => {
+app.put("/vote/:breed", async (req, res) => {
   const breed = req.params.breed;
-  const dbres = await client.query(
-    "update dog_breeds set votes=votes+1 where breed=$1 returning *",
-    [breed]
-  );
-  res.json(dbres.rows);
+  try {
+    const dbres = await client.query(
+      "update dog_breeds set votes=votes+1 where breed=$1 returning *",
+      [breed]
+    );
+    if (dbres.rows.length === 0) {
+      res
+        .status(404)
+        .json({
+          status: "failed",
+          message: `dog breed ${breed} does not exist`,
+        });
+    } else {
+      res.status(200).json({
+        status: "success",
+        message: "vote count has increased by 1",
+        data: dbres.rows,
+      });
+    }
+  } catch (err) {
+    res.status(404).json({ status: "failed", error: err });
+  }
 });
 
 //Start the server on the given port
