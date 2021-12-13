@@ -32,6 +32,22 @@ app.get("/", async (req, res) => {
   res.json(dbres.rows);
 });
 
+app.get("/leaderboard", async (req, res) => {
+  const dbres = await client.query(
+    "select breed, votes from dog_breeds order by votes desc limit 10"
+  );
+  res.json(dbres.rows);
+});
+
+app.put("/votes/:breed", async (req, res) => {
+  const breed = req.params.breed;
+  const dbres = await client.query(
+    "update dog_breeds set votes=votes+1 where breed=$1 returning *",
+    [breed]
+  );
+  res.json(dbres.rows);
+});
+
 //Start the server on the given port
 const port = process.env.PORT;
 if (!port) {
