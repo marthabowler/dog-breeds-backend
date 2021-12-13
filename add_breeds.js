@@ -1,0 +1,180 @@
+import pkg from "pg";
+const { Client } = pkg;
+import { config } from "dotenv";
+
+config();
+
+const herokuSSLSetting = { rejectUnauthorized: false };
+const sslSetting = process.env.LOCAL ? false : herokuSSLSetting;
+const dbConfig = {
+  connectionString: process.env.DATABASE_URL,
+  ssl: sslSetting,
+};
+
+const client = new Client(dbConfig);
+client.connect();
+
+const data = {
+  message: {
+    affenpinscher: [],
+    african: [],
+    airedale: [],
+    akita: [],
+    appenzeller: [],
+    australian: ["shepherd"],
+    basenji: [],
+    beagle: [],
+    bluetick: [],
+    borzoi: [],
+    bouvier: [],
+    boxer: [],
+    brabancon: [],
+    briard: [],
+    buhund: ["norwegian"],
+    bulldog: ["boston", "english", "french"],
+    bullterrier: ["staffordshire"],
+    cattledog: ["australian"],
+    chihuahua: [],
+    chow: [],
+    clumber: [],
+    cockapoo: [],
+    collie: ["border"],
+    coonhound: [],
+    corgi: ["cardigan"],
+    cotondetulear: [],
+    dachshund: [],
+    dalmatian: [],
+    dane: ["great"],
+    deerhound: ["scottish"],
+    dhole: [],
+    dingo: [],
+    doberman: [],
+    elkhound: ["norwegian"],
+    entlebucher: [],
+    eskimo: [],
+    finnish: ["lapphund"],
+    frise: ["bichon"],
+    germanshepherd: [],
+    greyhound: ["italian"],
+    groenendael: [],
+    havanese: [],
+    hound: [
+      "afghan",
+      "basset",
+      "blood",
+      "english",
+      "ibizan",
+      "plott",
+      "walker",
+    ],
+    husky: [],
+    keeshond: [],
+    kelpie: [],
+    komondor: [],
+    kuvasz: [],
+    labradoodle: [],
+    labrador: [],
+    leonberg: [],
+    lhasa: [],
+    malamute: [],
+    malinois: [],
+    maltese: [],
+    mastiff: ["bull", "english", "tibetan"],
+    mexicanhairless: [],
+    mix: [],
+    mountain: ["bernese", "swiss"],
+    newfoundland: [],
+    otterhound: [],
+    ovcharka: ["caucasian"],
+    papillon: [],
+    pekinese: [],
+    pembroke: [],
+    pinscher: ["miniature"],
+    pitbull: [],
+    pointer: ["german", "germanlonghair"],
+    pomeranian: [],
+    poodle: ["miniature", "standard", "toy"],
+    pug: [],
+    puggle: [],
+    pyrenees: [],
+    redbone: [],
+    retriever: ["chesapeake", "curly", "flatcoated", "golden"],
+    ridgeback: ["rhodesian"],
+    rottweiler: [],
+    saluki: [],
+    samoyed: [],
+    schipperke: [],
+    schnauzer: ["giant", "miniature"],
+    setter: ["english", "gordon", "irish"],
+    sheepdog: ["english", "shetland"],
+    shiba: [],
+    shihtzu: [],
+    spaniel: [
+      "blenheim",
+      "brittany",
+      "cocker",
+      "irish",
+      "japanese",
+      "sussex",
+      "welsh",
+    ],
+    springer: ["english"],
+    stbernard: [],
+    terrier: [
+      "american",
+      "australian",
+      "bedlington",
+      "border",
+      "cairn",
+      "dandie",
+      "fox",
+      "irish",
+      "kerryblue",
+      "lakeland",
+      "norfolk",
+      "norwich",
+      "patterdale",
+      "russell",
+      "scottish",
+      "sealyham",
+      "silky",
+      "tibetan",
+      "toy",
+      "welsh",
+      "westhighland",
+      "wheaten",
+      "yorkshire",
+    ],
+    tervuren: [],
+    vizsla: [],
+    waterdog: ["spanish"],
+    weimaraner: [],
+    whippet: [],
+    wolfhound: ["irish"],
+  },
+  status: "success",
+};
+
+const breedsObject = data.message;
+
+let breedArray = [];
+
+for (const property in breedsObject) {
+  if (breedsObject[property].length === 0) {
+    breedArray.push(property);
+  } else {
+    breedsObject[property].forEach((subBreed) =>
+      breedArray.push(`${property}-${subBreed}`)
+    );
+  }
+}
+
+breedArray.sort();
+
+async function addData(arr) {
+  for (let breed of arr) {
+    await client.query("insert into dog_breeds (breed) values($1)", [breed]);
+  }
+}
+
+addData(breedArray);

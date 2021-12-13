@@ -11,8 +11,9 @@ config(); //Read .env file lines as though they were env vars.
 //For the ssl property of the DB connection config, use a value of...
 // false - when connecting to a local DB
 // { rejectUnauthorized: false } - when connecting to a heroku DB
-const herokuSSLSetting = { rejectUnauthorized: false }
-const sslSetting = process.env.LOCAL ? false : herokuSSLSetting
+
+const herokuSSLSetting = { rejectUnauthorized: false };
+const sslSetting = process.env.LOCAL ? false : herokuSSLSetting;
 const dbConfig = {
   connectionString: process.env.DATABASE_URL,
   ssl: sslSetting,
@@ -21,21 +22,20 @@ const dbConfig = {
 const app = express();
 
 app.use(express.json()); //add body parser to each following route handler
-app.use(cors()) //add CORS support to each following route handler
+app.use(cors()); //add CORS support to each following route handler
 
 const client = new Client(dbConfig);
 client.connect();
 
 app.get("/", async (req, res) => {
-  const dbres = await client.query('select * from categories');
+  const dbres = await client.query("select breed, votes from dog_breeds");
   res.json(dbres.rows);
 });
-
 
 //Start the server on the given port
 const port = process.env.PORT;
 if (!port) {
-  throw 'Missing PORT environment variable.  Set it in .env file.';
+  throw "Missing PORT environment variable.  Set it in .env file.";
 }
 app.listen(port, () => {
   console.log(`Server is up and running on port ${port}`);
