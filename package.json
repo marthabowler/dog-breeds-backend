@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "type":"module",
   "scripts": {
     "start": "node dist/server.js",
     "start:dev": "LOCAL=true ts-node server.ts",
-    "postinstall": "tsc"
+    "postinstall": "tsc",
+    "start:dev:heroku": "ts-node-dev server.ts"
   },
   "author": "your name here",
   "license": "ISC",
