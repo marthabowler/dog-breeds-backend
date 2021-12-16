@@ -55,12 +55,10 @@ app.put("/vote/:breed", async (req, res) => {
       [breed]
     );
     if (dbres.rows.length === 0) {
-      res
-        .status(404)
-        .json({
-          status: "failed",
-          message: `dog breed ${breed} does not exist`,
-        });
+      res.status(400).json({
+        status: "failed",
+        message: `dog breed ${breed} does not exist`,
+      });
     } else {
       res.status(200).json({
         status: "success",
